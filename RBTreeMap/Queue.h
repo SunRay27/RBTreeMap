@@ -7,10 +7,10 @@ template <class T>
 class Queue
 {
 	size_t count;
-	Node<T>* last, *first;
+	Node<T>* last, * first;
 
 public:
-	~Queue() 
+	~Queue()
 	{
 		while (last != nullptr)
 		{
@@ -19,7 +19,7 @@ public:
 			first = nextNode;
 		}
 	}
-	Queue() : count(0), last(nullptr), first(nullptr)  {}
+	Queue() : count(0), last(nullptr), first(nullptr) {}
 
 	//**************************************************************//
 	//********ACHTUNG!!! HERE REAL STACK FUNCTIONS COME!!!**********//

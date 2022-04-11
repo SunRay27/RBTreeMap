@@ -10,7 +10,7 @@ class Stack
 	Node<T>* last;
 
 public:
-	~Stack() 
+	~Stack()
 	{
 		while (last != nullptr)
 		{
@@ -19,7 +19,7 @@ public:
 			last = prevNode;
 		}
 	}
-	Stack() : count(0), last(nullptr)  {}
+	Stack() : count(0), last(nullptr) {}
 
 	//**************************************************************//
 	//********ACHTUNG!!! HERE REAL STACK FUNCTIONS COME!!!**********//

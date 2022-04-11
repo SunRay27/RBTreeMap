@@ -31,6 +31,7 @@ public:
 	TreeDFTIterator(RBNode<TKey, TValue>* start, RBNode<TKey, TValue>* nil)
 	{
 		this->nil = nil;
+
 		PushToLeft(start);
 	}
 	RBNode<TKey, TValue>* Next() override
@@ -93,7 +94,7 @@ private:
 		}
 		return minv;
 	}
-	RBNode<TKey, TValue>* FindNode(TKey key)
+	RBNode<TKey, TValue>* findNode(TKey key)
 	{
 		RBNode<TKey, TValue>* current = root;
 		while (current != nil) {
@@ -111,6 +112,8 @@ private:
 	}
 
 #pragma region Tree_transformations
+
+	//i can't drown my demons, they know how to swim...
 	void TransplantNode(RBNode<TKey, TValue>* value, RBNode<TKey, TValue>* replacedBy)
 	{
 		if (value->GetParent() == nil)
@@ -120,74 +123,56 @@ private:
 		else
 			value->GetParent()->SetRight(replacedBy);
 
-
-		if (replacedBy != nil)
-			replacedBy->SetParent(value->GetParent());
-
-
-
+		replacedBy->SetParent(value->GetParent());
 	}
-	void LeftRotate(RBNode<TKey, TValue>* x)
+	void LeftRotate(RBNode<TKey, TValue>* node)
 	{
-		RBNode<TKey, TValue>* y = x->GetRight();
-		x->SetRight(y->GetLeft());
+		RBNode<TKey, TValue>* rightChild = node->GetRight();
+		node->SetRight(rightChild->GetLeft());
 
-		if (y->GetLeft() != nil)
-			y->GetLeft()->SetParent(x);
+		if (rightChild->GetLeft() != nil)
+			rightChild->GetLeft()->SetParent(node);
 
-		y->SetParent(x->GetParent());
+		rightChild->SetParent(node->GetParent());
 
-		if (x->GetParent() == nil)
-			root = y;
-		else if (x == x->GetParent()->GetLeft())
-			x->GetParent()->SetLeft(y);
+		if (node->GetParent() == nil)
+			root = rightChild;
+		else if (node == node->GetParent()->GetLeft())
+			node->GetParent()->SetLeft(rightChild);
 		else
-			x->GetParent()->SetRight(y);
+			node->GetParent()->SetRight(rightChild);
 
-		y->SetLeft(x);
-		x->SetParent(y);
+		rightChild->SetLeft(node);
+		node->SetParent(rightChild);
 	}
-	void RightRotate(RBNode<TKey, TValue>* x)
+	void RightRotate(RBNode<TKey, TValue>* node)
 	{
-		RBNode<TKey, TValue>* y = x->GetLeft();
-		x->SetLeft(y->GetRight());
+		RBNode<TKey, TValue>* leftChild = node->GetLeft();
+		node->SetLeft(leftChild->GetRight());
 
-		if (y->GetRight() != nil)
-			y->GetRight()->SetParent(x);
+		if (leftChild->GetRight() != nil)
+			leftChild->GetRight()->SetParent(node);
 
-		y->SetParent(x->GetParent());
+		leftChild->SetParent(node->GetParent());
 
-		if (x->GetParent() == nil)
-			root = y;
-		else if (x == x->GetParent()->GetRight())
-			x->GetParent()->SetRight(y);
+		if (node->GetParent() == nil)
+			root = leftChild;
+		else if (node == node->GetParent()->GetRight())
+			node->GetParent()->SetRight(leftChild);
 		else
-			x->GetParent()->SetLeft(y);
+			node->GetParent()->SetLeft(leftChild);
 
-		y->SetRight(x);
-		x->SetParent(y);
+		leftChild->SetRight(node);
+		node->SetParent(leftChild);
 	}
 	void RebuildTreeInsert(RBNode<TKey, TValue>* currentNode)
 	{
 		RBNode<TKey, TValue>* uncle = nil;
-		while (currentNode->GetParent() != nil && !currentNode->GetParent()->IsBlack())
+		while (!currentNode->GetParent()->IsBlack())
 		{
 			if (currentNode->GetParent() != currentNode->GetGrandparent()->GetLeft())
 			{
 				uncle = currentNode->GetGrandparent()->GetLeft();
-				//that means it is empty leaf and it is black
-				if (uncle == nil)
-				{
-					if (currentNode == currentNode->GetParent()->GetLeft())
-					{
-						currentNode = currentNode->GetParent();
-						RightRotate(currentNode);
-					}
-					currentNode->GetParent()->SetBlack();
-					currentNode->GetGrandparent()->SetRed();
-					LeftRotate(currentNode->GetGrandparent());
-					continue;
-				}
 
 				if (!uncle->IsBlack())
 				{
@@ -211,19 +196,6 @@ private:
 			else
 			{
 				uncle = currentNode->GetGrandparent()->GetRight();
-				//that means it is empty leaf and it is black
-				if (uncle == nil)
-				{
-					if (currentNode != currentNode->GetParent()->GetLeft())
-					{
-						currentNode = currentNode->GetParent();
-						LeftRotate(currentNode);
-					}
-					currentNode->GetParent()->SetBlack();
-					currentNode->GetGrandparent()->SetRed();
-					RightRotate(currentNode->GetGrandparent());
-					continue;
-				}
 
 				if (!uncle->IsBlack()) {
 					uncle->SetBlack();
@@ -250,73 +222,69 @@ private:
 	}
 	void RebuildTreeDelete(RBNode<TKey, TValue>* currentNode)
 	{
-		RBNode<TKey, TValue>* brother;
+		RBNode<TKey, TValue>* sibling;
 		while (currentNode != root && currentNode->IsBlack())
 		{
 			if (currentNode == currentNode->GetParent()->GetLeft())
 			{
-				brother = currentNode->GetParent()->GetRight();
+				sibling = currentNode->GetParent()->GetRight();
 
-				if (brother->IsBlack() == false)
+				if (sibling->IsBlack() == false)
 				{
-					brother->SetBlack();
+					sibling->SetBlack();
 					currentNode->GetParent()->SetRed();
 					LeftRotate(currentNode->GetParent());
-					brother = currentNode->GetParent()->GetRight();
+					sibling = currentNode->GetParent()->GetRight();
 				}
-
-				if (brother->GetLeft()->IsBlack() && !brother->GetRight()->IsBlack())
+				if (sibling->GetLeft()->IsBlack() && sibling->GetRight()->IsBlack())
 				{
-					brother->SetBlack();
+					sibling->SetRed();
 					currentNode = currentNode->GetParent();
+				}
+				else if (sibling->GetRight()->IsBlack())
+				{
+					sibling->GetLeft()->SetBlack();
+					sibling->SetRed();
+					RightRotate(sibling);
+					currentNode->GetParent()->SetRight(sibling);
 				}
 				else
 				{
-					if (brother->GetRight()->IsBlack())
-					{
-						brother->GetLeft()->SetRed();
-						brother->SetBlack();
-						RightRotate(brother);
-						brother = currentNode->GetParent()->GetRight();
-					}
-
-					brother->SetIsBlack(currentNode->GetParent()->IsBlack());
-					currentNode->GetParent()->SetBlack();
-					brother->GetRight()->SetBlack();
+					sibling->SetIsBlack(currentNode->GetParent()->IsBlack());
+					currentNode->GetGrandparent()->SetBlack();
+					sibling->GetRight()->SetBlack();
 					LeftRotate(currentNode->GetParent());
 					currentNode = root;
 				}
 			}
 			else
 			{
-				brother = currentNode->GetParent()->GetLeft();
+				sibling = currentNode->GetParent()->GetLeft();
 
-				if (brother->IsBlack())
+				if (sibling->IsBlack() == false)
 				{
-					brother->SetRed();
+					sibling->SetBlack();
 					currentNode->GetParent()->SetRed();
 					RightRotate(currentNode->GetParent());
-					brother = currentNode->GetParent()->GetLeft();
+					sibling = currentNode->GetParent()->GetLeft();
 				}
-
-				if (!brother->GetLeft()->IsBlack() && brother->GetRight()->IsBlack())
+				if (sibling->GetLeft()->IsBlack() && sibling->GetRight()->IsBlack())
 				{
-					brother->SetBlack();
+					sibling->SetRed();
 					currentNode = currentNode->GetParent();
+				}
+				else if (sibling->GetLeft()->IsBlack())
+				{
+					sibling->GetRight()->SetBlack();
+					sibling->SetRed();
+					LeftRotate(sibling);
+					currentNode->GetParent()->SetLeft(sibling);
 				}
 				else
 				{
-					if (brother->GetLeft()->IsBlack())
-					{
-						brother->GetRight()->SetBlack();
-						brother->SetRed();
-						LeftRotate(brother);
-						brother = currentNode->GetParent()->GetLeft();
-					}
-
-					brother->SetIsBlack(currentNode->GetParent()->IsBlack());
-					currentNode->GetParent()->SetRed();
-					brother->GetLeft()->SetRed();
+					sibling->SetIsBlack(currentNode->GetParent()->IsBlack());
+					currentNode->GetGrandparent()->SetBlack();
+					sibling->GetLeft()->SetBlack();
 					RightRotate(currentNode->GetParent());
 					currentNode = root;
 				}
@@ -328,19 +296,31 @@ private:
 
 public:
 
-	Map() { nil = new RBNode<TKey, TValue>(); root = nil; }
-	~Map() { Clear(); delete nil; }
+	Map()
+	{
+		nil = new RBNode<TKey, TValue>();
+
+		//nil node pointer?
+		nil->SetLeft(nil);
+		nil->SetRight(nil);
+		root = nil;
+	}
+	~Map()
+	{
+		Clear();
+		delete nil;
+	}
 
 	void Insert(TKey key, TValue value)
 	{
 		if (GetKeys().Contains(key))
-			throw std::invalid_argument("Key already exists in map");
-
+			throw std::invalid_argument("key is already present");
 
 		RBNode<TKey, TValue>* newNode = new RBNode<TKey, TValue>(false, key, value, nil, nil, nil);
 		RBNode<TKey, TValue>* curNode = root;
 		RBNode<TKey, TValue>* target = curNode;
 
+		//get node to attach new node to
 		while (curNode != nil)
 		{
 			target = curNode;
@@ -349,6 +329,7 @@ public:
 			else
 				curNode = curNode->GetRight();
 		}
+		//no such node - map is empty
 		if (target == nil)
 		{
 			newNode->SetBlack();
@@ -356,14 +337,16 @@ public:
 			return;
 		}
 
+		
 		newNode->SetParent(target);
 
-
+		//decide new node left/right position
 		if (newNode->GetKey() < target->GetKey())
 			target->SetLeft(newNode);
 		else
 			target->SetRight(newNode);
 
+		//tree contains only 2 elements so we don't need to rebuild it
 		if (newNode->GetGrandparent() == nil)
 			return;
 
@@ -371,114 +354,102 @@ public:
 	}
 	TValue Find(TKey key)
 	{
-		return FindNode(key)->GetValue();
+		return findNode(key)->GetValue();
 		throw invalid_argument("key is not present in collection");
 	}
 	List<TKey> GetKeys()
 	{
+		 //just get 'em all via bft
 		List<TKey> keys;
 		Iterator<TKey, TValue>* bft = CreateBFTIterator();
+
 		while (bft->HasNext())
 			keys.Add(bft->Next()->GetKey());
+
 		delete bft;
 		return keys;
 	}
 	List<TValue> GetValues()
 	{
+		//just get 'em all via bft
 		List<TValue> values;
 		Iterator<TKey, TValue>* bft = CreateBFTIterator();
+
 		while (bft->HasNext())
 			values.Add(bft->Next()->GetValue());
+
 		delete bft;
 		return values;
 	}
 	void Print()
 	{
-		TreePrinter<TKey, TValue> a;
+		TreePrinter<TKey, TValue> a(nil);
 		cout << endl << endl;
 		a.PrintTree(root, nullptr, false);
 	}
 	void Remove(TKey key)
 	{
-		RBNode<TKey, TValue>* toDelete = FindNode(key);
+		RBNode<TKey, TValue>* toDelete = findNode(key);
 		bool originalColorIsBlack = toDelete->IsBlack();
-		RBNode<TKey, TValue>* x;
-		RBNode<TKey, TValue>* y;
+		RBNode<TKey, TValue>* child;
 
-		//transplant left nil node
+		//transplant nil nodes
 		if (toDelete->GetLeft() == nil)
 		{
-			x = toDelete->GetRight();
-			TransplantNode(toDelete, x);
+			child = toDelete->GetRight();
+			TransplantNode(toDelete, child);
 		}
-		//transplant right nil node
 		else if (toDelete->GetRight() == nil)
 		{
-			x = toDelete->GetLeft();
-			TransplantNode(toDelete, x);
+			child = toDelete->GetLeft();
+			TransplantNode(toDelete, child);
 		}
 		else
 		{
 			//find smallest key in right subtree and save its color
-			y = minKeyNode(toDelete->GetRight());
-			originalColorIsBlack = y->IsBlack();
+			RBNode<TKey, TValue>* minNode = minKeyNode(toDelete->GetRight());
+			originalColorIsBlack = minNode->IsBlack();
+			child = minNode->GetRight();
 
-			//x = smallest key right node
-			x = y->GetRight();
-
-
-			if (y->GetParent() == toDelete)
+			if (minNode->GetParent() != toDelete)
 			{
-				x->SetParent(y);
-			}
-			else
-			{
-				TransplantNode(y, y->GetRight());
-				y->SetRight(toDelete->GetRight());
-				//if(x != nil)
-				y->GetRight()->SetParent(y);
-				//if(y != toDelete->GetLeft())
-				
-
+				TransplantNode(minNode, minNode->GetRight());
+				minNode->SetRight(toDelete->GetRight());
+				minNode->GetRight()->SetParent(minNode);
 			}
 
+			TransplantNode(toDelete, minNode);
+			minNode->SetLeft(toDelete->GetLeft());
+			minNode->GetLeft()->SetParent(minNode);
 
-
-			TransplantNode(toDelete, y);
-			y->SetLeft(toDelete->GetLeft());
-			y->GetLeft()->SetParent(y);
-			y->SetIsBlack(originalColorIsBlack);
-
+			if (!originalColorIsBlack)
+				minNode->SetBlack();
 		}
 
-		//clear toDelete node links before deleting 
-
-		//if (toDelete == toDelete->GetParent()->GetLeft())
-		//	toDelete->GetParent()->SetLeft(nil);
-		//else
-		//	toDelete->GetParent()->SetRight(nil);
-
+		//delete target node
 		toDelete->SetLeft(nullptr);
 		toDelete->SetRight(nullptr);
-
 		delete toDelete;
 
 		//rebuild tree
-		if (originalColorIsBlack && x != nil)
-			RebuildTreeDelete(x);
+		if (originalColorIsBlack)
+			RebuildTreeDelete(child);
 	}
 	void Clear()
 	{
+		//just iterate and delete every node
 		Iterator<TKey, TValue>* bft = CreateBFTIterator();
 		while (bft->HasNext())
 			delete bft->Next();
 
 		delete bft;
-		root = nil;
 
+		//except nil node
+		root = nil;
 	}
 	bool Contains(TKey key)
 	{
+		//bin search
 		RBNode<TKey, TValue>* current = root;
 		while (current != nil) {
 			if (key == current->GetKey())
@@ -494,6 +465,6 @@ public:
 		return false;
 	}
 
-	Iterator<TKey, TValue>* CreateDFTIterator() { return new TreeDFTIterator<TKey, TValue>(root,nil); }
+	Iterator<TKey, TValue>* CreateDFTIterator() { return new TreeDFTIterator<TKey, TValue>(root, nil); }
 	Iterator<TKey, TValue>* CreateBFTIterator() { return new TreeBFTIterator<TKey, TValue>(root, nil); }
 };

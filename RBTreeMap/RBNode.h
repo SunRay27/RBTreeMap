@@ -8,21 +8,10 @@ class RBNode
 	bool isBlack;
 	TKey key;
 	TValue value;
-	RBNode<TKey, TValue> * left,* right, * parent;
+	RBNode<TKey, TValue>* left, * right, * parent;
 
-	
-	
 
 public:
-	~RBNode() 
-	{
-		//if (right != nullptr)
-			//delete right;
-		
-		//if (left != nullptr)
-			//delete left;
-		
-	}
 	RBNode()
 	{
 		this->isBlack = true;
@@ -41,6 +30,8 @@ public:
 		this->left = left;
 		this->right = right;
 	}
+
+#pragma region getters/setters lol
 	void SetParent(RBNode<TKey, TValue>* parent)
 	{
 		this->parent = parent;
@@ -65,7 +56,7 @@ public:
 	{
 		isBlack = false;
 	}
-	void SetIsBlack( bool newValue)
+	void SetIsBlack(bool newValue)
 	{
 		isBlack = newValue;
 	}
@@ -106,4 +97,6 @@ public:
 	{
 		return parent->parent;
 	}
+#pragma endregion
+
 };

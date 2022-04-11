@@ -6,8 +6,8 @@
 template <class T>
 class List
 {
-	 size_t curElement; size_t count;
-	 Node<T> *head, *tail, *current, *previous;
+	size_t curElement; size_t count;
+	Node<T>* head, * tail, * current, * previous;
 
 private:
 #pragma region Low-level private functions
@@ -58,7 +58,7 @@ private:
 	}
 
 	//and exception thrower
-	void CheckBounds(size_t index)
+	void CheckBounds(size_t index) const
 	{
 		if (index < 0 || index > count - 1 || count == 0)
 			throw std::exception("Index is out of bounds");
@@ -66,7 +66,7 @@ private:
 #pragma endregion
 
 public:
-	~List() {Clear();}
+	~List() { Clear(); }
 	List() : count(0), curElement(0), head(nullptr), tail(nullptr), current(nullptr), previous(nullptr) {}
 
 	template <class T>
@@ -131,8 +131,8 @@ public:
 		Node<T>* jNode = GetNode(j);
 		Node<T>* jNodeNext = GetNode(j + 1);
 
-		
-		
+
+
 
 		//swap head/tail if needed
 		if (iNode == head)
@@ -181,7 +181,7 @@ public:
 		Node<T>* toAdd = new Node<T>(value);
 
 		//Check if list is clean and if so, setup global pointers
-		if(IsEmpty())
+		if (IsEmpty())
 			head = current = previous = tail = toAdd;
 		else
 		{
@@ -191,7 +191,7 @@ public:
 			MoveToHead();
 		}
 		count++;
-		
+
 	}
 	/*+*/void InsertFirst(T value)
 	{
@@ -208,7 +208,7 @@ public:
 			MoveToHead();
 		}
 		count++;
-		
+
 	}
 	/*+*/void PopBack()
 	{
@@ -274,7 +274,7 @@ public:
 		Node<T>* toInsert = new Node<T>(value);
 
 		//Set new links
-		if(previousNode != nullptr)
+		if (previousNode != nullptr)
 			previousNode->SetNext(toInsert);
 		toInsert->SetNext(moveNode);
 
@@ -358,9 +358,9 @@ public:
 	/*+*/bool IsEmpty()
 	{
 		return count < 1;
-	} 
-	
-	
+	}
+
+
 	/*+*/size_t FindFirst(List<T>& list)
 	{
 		//1. go through this list and get first matching element
@@ -374,7 +374,7 @@ public:
 
 		for (size_t i = 0; i < firstLength; i++)
 		{
-			
+
 			for (size_t j = 0; j < secondLength; j++)
 			{
 				// if elements count from first is already smaller than second's length, we know first doesnt contain it for sure
@@ -443,17 +443,29 @@ public:
 		tail = nullptr;
 		current = nullptr;
 		previous = nullptr;
-		
+
 		for (size_t i = 0; i < other.count; i++)
 		{
 			T value = (other).At(i);
 			this->Add(value);
 		}
 
-		
-	}
 
-	List<T>& operator=(const List<T>& other) 
+	}
+	static List<T> Copy(List<T> other)
+	{
+		List<T> toReturn;
+
+		for (size_t i = 0; i < other.count; i++)
+		{
+			T value = (other).At(i);
+			toReturn.Add(value);
+		}
+		retrun toReturn;
+
+	}
+	/*
+	List<T>& operator=(List<T>& other)
 	{
 		count = 0;
 		curElement = 0;
@@ -466,5 +478,5 @@ public:
 			this->Add(other.At(i));
 
 		return *this;
-	}
+	}*/
 };
