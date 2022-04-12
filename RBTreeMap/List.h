@@ -452,16 +452,16 @@ public:
 
 
 	}
-	static List<T> Copy(List<T> other)
+	List<T> * PointerToCopy()
 	{
-		List<T> toReturn;
+		List<T> * toReturn = new List<T>();
 
-		for (size_t i = 0; i < other.count; i++)
+		for (size_t i = 0; i < GetSize(); i++)
 		{
-			T value = (other).At(i);
-			toReturn.Add(value);
+			T value = At(i);
+			toReturn->Add(value);
 		}
-		retrun toReturn;
+		return toReturn;
 
 	}
 	/*

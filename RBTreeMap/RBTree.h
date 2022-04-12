@@ -381,12 +381,7 @@ public:
 		delete bft;
 		return values;
 	}
-	void Print()
-	{
-		TreePrinter<TKey, TValue> a(nil);
-		cout << endl << endl;
-		a.PrintTree(root, nullptr, false);
-	}
+	
 	void Remove(TKey key)
 	{
 		RBNode<TKey, TValue>* toDelete = findNode(key);
@@ -463,6 +458,13 @@ public:
 			}
 		}
 		return false;
+	}
+
+	void Print()
+	{
+		TreePrinter<TKey, TValue> a(nil);
+		cout << endl << endl;
+		a.PrintTree(root, nullptr, false);
 	}
 
 	Iterator<TKey, TValue>* CreateDFTIterator() { return new TreeDFTIterator<TKey, TValue>(root, nil); }

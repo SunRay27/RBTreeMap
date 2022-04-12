@@ -22,6 +22,19 @@ int main()
 		map.Print();
 	}
 
+	List<int>* keys = map.GetKeys().PointerToCopy();
+	List<double>* values = map.GetValues().PointerToCopy();
+
+	cout << "All keys: " << endl;
+	for (size_t i = 0; i < keys->GetSize(); i++)
+		cout << keys->At(i) << " ";
+	cout << endl;
+
+	cout << "All values: " << endl;
+	for (size_t i = 0; i < values->GetSize(); i++)
+		cout << values->At(i) << " ";
+	cout << endl;
+
 	for (size_t i = 1; i < 6; i++)
 	{
 		printf("removing %i", i);
@@ -30,7 +43,8 @@ int main()
 	}
 
 	map.Clear();
-
+	delete keys;
+	delete values;
 }
 
 
